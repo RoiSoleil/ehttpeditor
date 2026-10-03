@@ -302,7 +302,15 @@ class EHttpEditorEndToEndTest {
 
 	@Test
 	void thePreferencesAreInTheirPage() {
-		bot.menu("Window").menu("Preferences").click();
+		// Window > Preferences, by its command: the label of the menu item differs between the platforms.
+		UIThreadRunnable.asyncExec(() -> {
+			try {
+				PlatformUI.getWorkbench().getService(IHandlerService.class)
+						.executeCommand("org.eclipse.ui.window.preferences", null);
+			} catch (Exception e) {
+				throw new IllegalStateException(e);
+			}
+		});
 		SWTBotShell preferences = bot.shell("Preferences");
 		preferences.activate();
 		preferences.bot().tree().select("HTTP Client");
