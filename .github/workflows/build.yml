@@ -66,6 +66,10 @@ jobs:
             text = "\n".join(out)
             print(text)
             print("::notice title=Coverage::" + text.replace("%", "%25").replace("\n", "%0A"), file=sys.stderr)
+            # The minimum coverage of the plug-in
+            if 100 * cov < 85 * (cov + mis):
+                print("::error title=Coverage::The coverage is under 85%%: %d%%" % (100 * cov // (cov + mis)), file=sys.stderr)
+                sys.exit(1)
             PY
       -  name: Report the failure
          # The failure as annotations of the run: readable with the REST API of GitHub.
