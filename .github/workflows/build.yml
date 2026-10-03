@@ -39,6 +39,34 @@ jobs:
             files: tests/org.eclipse.ehttpeditor.coverage/target/site/jacoco-aggregate/jacoco.xml
             fail_ci_if_error: true
             token: ${{ secrets.CODECOV_TOKEN }}
+      -  name: Coverage by class
+         # The line coverage of each class, in the summary of the run and as an annotation.
+         run: |
+            python3 - tests/org.eclipse.ehttpeditor.coverage/target/site/jacoco-aggregate/jacoco.xml <<'PY' | tee -a "$GITHUB_STEP_SUMMARY"
+            import sys, xml.etree.ElementTree as ET
+            root = ET.parse(sys.argv[1]).getroot()
+            def lines(e):
+                c = [x for x in e.findall("counter") if x.get("type") == "LINE"]
+                return (int(c[0].get("covered")), int(c[0].get("missed"))) if c else (0, 0)
+            rows = []
+            for p in root.iter("package"):
+                for c in p.findall("class"):
+                    if "$" in c.get("name"):
+                        continue
+                    cov, mis = 0, 0
+                    for cc in p.findall("class"):
+                        if cc.get("name") == c.get("name") or cc.get("name").startswith(c.get("name") + "$"):
+                            a, b = lines(cc); cov += a; mis += b
+                    if cov + mis:
+                        rows.append((mis, cov, c.get("name").split("/")[-1]))
+            cov, mis = lines(root)
+            out = ["Total: %d%% (%d/%d lines)" % (100 * cov // (cov + mis), cov, cov + mis)]
+            for mis, c, name in sorted(rows, reverse=True):
+                out.append("%s %d%% (%d missed)" % (name, 100 * c // (c + mis), mis))
+            text = "\n".join(out)
+            print(text)
+            print("::notice title=Coverage::" + text.replace("%", "%25").replace("\n", "%0A"), file=sys.stderr)
+            PY
       -  name: Report the failure
          # The failure as annotations of the run: readable with the REST API of GitHub.
          if: failure()
