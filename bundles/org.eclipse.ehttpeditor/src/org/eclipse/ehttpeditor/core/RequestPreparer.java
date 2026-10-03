@@ -262,17 +262,18 @@ public final class RequestPreparer {
 				throw new IllegalArgumentException("Invalid URL (@no-auto-encoding): " + e.getMessage(), e);
 			}
 		}
-		String fragment = null;
-		int hash = u.indexOf('#');
-		if (hash >= 0) {
-			fragment = u.substring(hash + 1);
-			u = u.substring(0, hash);
-		}
+		// A fragment is never sent: a # in the query is a character of a value (name=@#$x), encoded as %23.
 		String query = null;
 		int question = u.indexOf('?');
 		if (question >= 0) {
 			query = u.substring(question + 1);
 			u = u.substring(0, question);
+		}
+		String fragment = null;
+		int hash = u.indexOf('#');
+		if (hash >= 0) {
+			fragment = u.substring(hash + 1);
+			u = u.substring(0, hash);
 		}
 		StringBuilder sb = new StringBuilder(encodeLoose(u));
 		if (query != null) {

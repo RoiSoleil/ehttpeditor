@@ -62,10 +62,11 @@ public class RequestPreparerTest {
 
 	@Test
 	public void encoding() {
-		assertEquals("https://h/a%20b/%C3%A9?x=%2F%40&y=%40%23&z#frag%20ment",
+		assertEquals("https://h/a%20b/%C3%A9?x=%2F%40&y=%40%23&z%23frag%20ment",
 				RequestPreparer.toUri("https://h/a b/é?x=/@&y=%40%23&z#frag ment", true).toString());
+		assertEquals("https://h/a%20b#frag", RequestPreparer.toUri("https://h/a b#frag", true).toString());
 		assertEquals("http://h/p?name=%40%23%24somebody&qwerty=%40%23%24",
-				RequestPreparer.toUri("h/p?name=@%23$somebody&qwerty=%40%23%24", true).toString());
+				RequestPreparer.toUri("h/p?name=@#$somebody&qwerty=%40%23%24", true).toString());
 		assertEquals("http://h/p?a=%40", RequestPreparer.toUri("http://h/p?a=%40", false).toString());
 		assertThrows(IllegalArgumentException.class, () -> RequestPreparer.toUri("http://h/a b", false));
 		assertEquals("a%2Fb%20c%25", RequestPreparer.encodeComponent("a/b c%"));
