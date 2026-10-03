@@ -23,7 +23,14 @@
 					<providerHint>junit5</providerHint>
 					<showEclipseLog>true</showEclipseLog>
 					<application>org.eclipse.ui.ide.workbench</application>
-					<argLine>${tycho.testArgLine} -Dorg.eclipse.swtbot.screenshots.dir=${project.build.directory}/screenshots -Dorg.eclipse.swtbot.search.timeout=20000</argLine>
+					<!--
+						No argLine here: written in the pom, ${tycho.testArgLine} would be read before jacoco:prepare-agent
+						sets it, and the tests would run without the agent of the coverage. Tycho adds it itself.
+					-->
+					<systemProperties>
+						<org.eclipse.swtbot.screenshots.dir>${project.build.directory}/screenshots</org.eclipse.swtbot.screenshots.dir>
+						<org.eclipse.swtbot.search.timeout>20000</org.eclipse.swtbot.search.timeout>
+					</systemProperties>
 					<bundleStartLevel>
 						<bundle>
 							<id>org.apache.felix.scr</id>
