@@ -55,10 +55,10 @@ class OpenDocuments implements Listener {
 		if (workspace == null || !workspace.isSet()) {
 			return;
 		}
-		File file = new File(workspace.getURL().getFile(), "requests.http"); //$NON-NLS-1$
+		File file = new File(workspace.getURL().getFile(), Templates.REQUESTS);
 		try {
 			if (!file.exists()) {
-				NewFileHandler.create(file);
+				Templates.write(Templates.REQUESTS, file);
 			}
 		} catch (IOException e) {
 			ILog.of(OpenDocuments.class).error("Cannot create " + file, e); //$NON-NLS-1$

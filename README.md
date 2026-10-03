@@ -99,6 +99,8 @@ from the [latest build](https://github.com/RoiSoleil/ehttpeditor/releases/tag/la
 - At the start, `requests.http` opens, with commented examples of GET and POST (in `ehttpeditor-workspace`, in the
   home folder). *File > New HTTP File...* creates another one, *File > Open File...* opens a file, and
   `ehttpeditor path/to/file.http` opens it from the command line.
+- The menu *Environments* chooses the environment and opens the environment files (`http-client.env.json`,
+  `http-client.private.env.json` for the secrets) of the folder of the current file, created with examples.
 - *Help > Documentation* opens the [guide](docs/guide.md): the syntax, the variables, the environments, the scripts.
 - macOS: the application is not signed; after the extraction, `xattr -cr EHttpEditor.app` lets it start.
 

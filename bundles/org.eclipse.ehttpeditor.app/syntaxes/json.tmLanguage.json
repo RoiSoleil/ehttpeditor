@@ -1,0 +1,45 @@
+{
+  "name": "JSON",
+  "scopeName": "source.json.ehttpeditor",
+  "patterns": [ { "include": "#value" } ],
+  "repository": {
+    "value": {
+      "patterns": [
+        { "include": "#object" },
+        { "include": "#array" },
+        { "include": "#string" },
+        { "name": "constant.numeric.json", "match": "-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?" },
+        { "name": "constant.language.json", "match": "\\b(?:true|false|null)\\b" }
+      ]
+    },
+    "object": {
+      "begin": "\\{",
+      "beginCaptures": { "0": { "name": "punctuation.definition.dictionary.begin.json" } },
+      "end": "\\}",
+      "endCaptures": { "0": { "name": "punctuation.definition.dictionary.end.json" } },
+      "patterns": [
+        {
+          "name": "support.type.property-name.json",
+          "match": "\"(?:[^\"\\\\]|\\\\.)*\"(?=\\s*:)"
+        },
+        { "name": "punctuation.separator.dictionary.key-value.json", "match": ":" },
+        { "name": "punctuation.separator.dictionary.pair.json", "match": "," },
+        { "include": "#value" }
+      ]
+    },
+    "array": {
+      "begin": "\\[",
+      "beginCaptures": { "0": { "name": "punctuation.definition.array.begin.json" } },
+      "end": "\\]",
+      "endCaptures": { "0": { "name": "punctuation.definition.array.end.json" } },
+      "patterns": [
+        { "name": "punctuation.separator.array.json", "match": "," },
+        { "include": "#value" }
+      ]
+    },
+    "string": {
+      "name": "string.quoted.double.json",
+      "match": "\"(?:[^\"\\\\]|\\\\.)*\""
+    }
+  }
+}

@@ -26,7 +26,10 @@ responses. At the first start, `requests.http` opens with a few commented exampl
 `ehttpeditor-workspace` of your home folder, and opens again at each start.
 
 - *File > New HTTP File...* creates a file with the same examples, where you want.
-- *File > Open File...* (**Ctrl+O**) opens an `.http` file, or any text file (`http-client.env.json`...).
+- *File > Open File...* (**Ctrl+O**) opens an `.http` file, an environment file or any text file.
+- *Environments > Edit Environments* and *Edit Private Environments* open the
+  [environment files](#environments) of the folder of the current file, created with examples the first time;
+  *Environments > Select Environment...* (**Ctrl+Alt+E**) chooses the environment.
 - A file given on the command line, `ehttpeditor path/to/requests.http`, opens in the window.
 - *Help > Documentation* opens this guide.
 
@@ -112,9 +115,16 @@ The environments are in `http-client.env.json`, in the folder of the `.http` fil
 `$shared` is in every environment. The secrets go in `http-client.private.env.json`, next to it, which is not
 committed: its values are added to the ones of `http-client.env.json`.
 
-The environment is chosen with **Environment: ...** above the first request, in the *HTTP Client* view, or with
-**Ctrl+Alt+E**. `"SSLConfiguration": {"verifyHostCertificate": false}` in an environment accepts the certificates
-which are not trusted (a local server).
+The environment is chosen with **Environment: ...** above the first request, in the *HTTP Client* view, with
+**Ctrl+Alt+E**, or with *Environments > Select Environment...* in the standalone application.
+
+In the standalone application, *Environments > Edit Environments* opens `http-client.env.json` of the folder of the
+current file, and *Environments > Edit Private Environments* its `http-client.private.env.json`: when they do not
+exist, they are created with an example (a `$shared` base URL, a user by environment, the passwords in the
+private file), which the last request of the first `requests.http` uses. The JSON files are colored.
+
+`"SSLConfiguration": {"verifyHostCertificate": false}` in an environment accepts the certificates which are not
+trusted (a local server).
 
 ## Bodies
 

@@ -34,7 +34,50 @@
       </perspective>
    </extension>
 
-   <!-- File > New HTTP File..., File > Open File... and Help > Documentation -->
+   <!--
+      The environment files (http-client.env.json, http-client.private.env.json) and the other JSON files: the
+      Generic Editor, colored by TM4E.
+   -->
+   <extension point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            id="json"
+            base-type="org.eclipse.core.runtime.text"
+            file-extensions="json"
+            name="%contentType.json"
+            priority="low"
+            default-charset="UTF-8">
+      </content-type>
+   </extension>
+
+   <extension point="org.eclipse.ui.editors">
+      <editorContentTypeBinding
+            contentTypeId="org.eclipse.ehttpeditor.app.json"
+            editorId="org.eclipse.ui.genericeditor.GenericEditor">
+      </editorContentTypeBinding>
+   </extension>
+
+   <extension point="org.eclipse.tm4e.registry.grammars">
+      <grammar
+            scopeName="source.json.ehttpeditor"
+            path="syntaxes/json.tmLanguage.json">
+      </grammar>
+      <scopeNameContentTypeBinding
+            contentTypeId="org.eclipse.ehttpeditor.app.json"
+            scopeName="source.json.ehttpeditor">
+      </scopeNameContentTypeBinding>
+   </extension>
+
+   <extension point="org.eclipse.tm4e.languageconfiguration.languageConfigurations">
+      <languageConfiguration
+            contentTypeId="org.eclipse.ehttpeditor.app.json"
+            path="language-configurations/json.language-configuration.json">
+      </languageConfiguration>
+   </extension>
+
+   <!--
+      File > New HTTP File..., File > Open File..., the menu Environments and Help > Documentation. The data of the
+      class of EditEnvironmentHandler is the file it opens.
+   -->
    <extension point="org.eclipse.ui.commands">
       <command
             id="org.eclipse.ehttpeditor.app.newFile"
@@ -43,6 +86,16 @@
       <command
             id="org.eclipse.ehttpeditor.app.openFile"
             name="%command.openFile">
+      </command>
+      <command
+            id="org.eclipse.ehttpeditor.app.editEnvironments"
+            name="%command.editEnvironments"
+            description="%command.editEnvironments.description">
+      </command>
+      <command
+            id="org.eclipse.ehttpeditor.app.editPrivateEnvironments"
+            name="%command.editPrivateEnvironments"
+            description="%command.editPrivateEnvironments.description">
       </command>
       <command
             id="org.eclipse.ehttpeditor.app.documentation"
@@ -58,6 +111,14 @@
       <handler
             class="org.eclipse.ehttpeditor.app.OpenFileHandler"
             commandId="org.eclipse.ehttpeditor.app.openFile">
+      </handler>
+      <handler
+            class="org.eclipse.ehttpeditor.app.EditEnvironmentHandler:http-client.env.json"
+            commandId="org.eclipse.ehttpeditor.app.editEnvironments">
+      </handler>
+      <handler
+            class="org.eclipse.ehttpeditor.app.EditEnvironmentHandler:http-client.private.env.json"
+            commandId="org.eclipse.ehttpeditor.app.editPrivateEnvironments">
       </handler>
       <handler
             class="org.eclipse.ehttpeditor.app.DocumentationHandler"
@@ -79,6 +140,19 @@
       <menuContribution locationURI="menu:file?after=open">
          <command commandId="org.eclipse.ehttpeditor.app.newFile" style="push"/>
          <command commandId="org.eclipse.ehttpeditor.app.openFile" style="push"/>
+      </menuContribution>
+      <menuContribution locationURI="menu:org.eclipse.ui.main.menu?after=edit">
+         <menu id="environments" label="%menu.environments">
+            <!-- The command of the plug-in, Ctrl+Alt+E in the HTTP editors -->
+            <command
+                  commandId="org.eclipse.ehttpeditor.commands.selectEnvironment"
+                  icon="platform:/plugin/org.eclipse.ehttpeditor/icons/environment.png"
+                  label="%command.selectEnvironment"
+                  style="push"/>
+            <separator name="edit" visible="true"/>
+            <command commandId="org.eclipse.ehttpeditor.app.editEnvironments" style="push"/>
+            <command commandId="org.eclipse.ehttpeditor.app.editPrivateEnvironments" style="push"/>
+         </menu>
       </menuContribution>
       <menuContribution locationURI="menu:help?after=additions">
          <command commandId="org.eclipse.ehttpeditor.app.documentation" style="push"/>

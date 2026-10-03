@@ -43,3 +43,14 @@ client.global.set("name", response.body.json.name);
 
 ### Uses the value kept by the previous request (run the POST first)
 GET {{host}}/anything/{{name}}
+
+### A request with the variables of an environment
+# The environments are in http-client.env.json, next to this file: Environments > Edit Environments creates it with
+# examples. The secrets (passwords, tokens) go in http-client.private.env.json (Environments > Edit Private
+# Environments), a file which is not shared. Choose the environment with Environments > Select Environment
+# (Ctrl+Alt+E), or with "Environment:" above the first request of the file.
+# With the environment "dev" of the examples, {{baseUrl}} is https://httpbin.org (from "$shared", in every
+# environment), {{user}} is "dev" and {{password}} is "dev-secret". Hover a variable to see its value.
+# "Authorization: Basic user password" is encoded for you.
+GET {{baseUrl}}/basic-auth/{{user}}/{{password}}
+Authorization: Basic {{user}} {{password}}
