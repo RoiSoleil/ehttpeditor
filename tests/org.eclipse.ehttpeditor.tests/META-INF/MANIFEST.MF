@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: EHttpEditor Tests
+Bundle-RequiredExecutionEnvironment: JavaSE-21
+Bundle-SymbolicName: org.eclipse.ehttpeditor.tests
+Bundle-Version: 1.0.0.qualifier
+Fragment-Host: org.eclipse.ehttpeditor
+Require-Bundle: junit-jupiter-api;bundle-version="[5.9.0,6.0.0)"
+Automatic-Module-Name: org.eclipse.ehttpeditor.tests
+Bundle-Vendor: RoiSoleil

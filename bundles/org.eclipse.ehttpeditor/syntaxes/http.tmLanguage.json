@@ -1,0 +1,159 @@
+{
+	"name": "HTTP Request",
+	"scopeName": "source.http",
+	"fileTypes": ["http", "rest"],
+	"patterns": [
+		{ "include": "#separator" },
+		{ "include": "#directive" },
+		{ "include": "#comment" },
+		{ "include": "#inplace-variable" },
+		{ "include": "#script" },
+		{ "include": "#response-redirect" },
+		{ "include": "#file-inclusion" },
+		{ "include": "#request-line" },
+		{ "include": "#header" },
+		{ "include": "#json" },
+		{ "include": "#variable" }
+	],
+	"repository": {
+		"separator": {
+			"match": "^(###)(.*)$",
+			"captures": {
+				"1": { "name": "keyword.other.separator.http" },
+				"2": { "name": "entity.name.section.http" }
+			}
+		},
+		"directive": {
+			"match": "^\\s*(#|//)\\s*(@[A-Za-z][\\w-]*)(.*)$",
+			"captures": {
+				"1": { "name": "comment.line.http punctuation.definition.comment.http" },
+				"2": { "name": "storage.type.annotation.http" },
+				"3": { "name": "string.unquoted.directive.http" }
+			}
+		},
+		"comment": {
+			"match": "^\\s*(#|//).*$",
+			"name": "comment.line.http"
+		},
+		"inplace-variable": {
+			"match": "^(@)([\\w.\\-]+)\\s*(=)\\s*(.*)$",
+			"captures": {
+				"1": { "name": "punctuation.definition.variable.http" },
+				"2": { "name": "variable.other.definition.http" },
+				"3": { "name": "keyword.operator.assignment.http" },
+				"4": {
+					"name": "string.unquoted.value.http",
+					"patterns": [{ "include": "#variable" }]
+				}
+			}
+		},
+		"script": {
+			"begin": "^\\s*([<>])\\s*(\\{%)",
+			"beginCaptures": {
+				"1": { "name": "keyword.operator.script.http" },
+				"2": { "name": "punctuation.section.embedded.begin.http" }
+			},
+			"end": "(%\\})",
+			"endCaptures": {
+				"1": { "name": "punctuation.section.embedded.end.http" }
+			},
+			"contentName": "meta.embedded.block.javascript source.js",
+			"patterns": [
+				{ "include": "source.js" },
+				{ "include": "#javascript" }
+			]
+		},
+		"javascript": {
+			"patterns": [
+				{ "match": "//.*$", "name": "comment.line.double-slash.js" },
+				{ "begin": "/\\*", "end": "\\*/", "name": "comment.block.js" },
+				{ "match": "\\b(const|let|var|function|return|if|else|for|while|do|switch|case|break|continue|new|try|catch|finally|throw|typeof|instanceof|in|of|await|async)\\b", "name": "keyword.control.js" },
+				{ "match": "\\b(true|false|null|undefined)\\b", "name": "constant.language.js" },
+				{ "match": "\\b(client|response|request|crypto|console|jsonPath)\\b", "name": "support.variable.http-client.js" },
+				{ "match": "\\b\\d+(\\.\\d+)?\\b", "name": "constant.numeric.js" },
+				{ "begin": "\"", "end": "\"", "name": "string.quoted.double.js", "patterns": [{ "match": "\\\\.", "name": "constant.character.escape.js" }] },
+				{ "begin": "'", "end": "'", "name": "string.quoted.single.js", "patterns": [{ "match": "\\\\.", "name": "constant.character.escape.js" }] },
+				{ "begin": "`", "end": "`", "name": "string.template.js", "patterns": [{ "match": "\\\\.", "name": "constant.character.escape.js" }] }
+			]
+		},
+		"response-redirect": {
+			"match": "^\\s*(>>!?)\\s*(.*)$",
+			"captures": {
+				"1": { "name": "keyword.operator.redirect.http" },
+				"2": { "name": "string.unquoted.path.http", "patterns": [{ "include": "#variable" }] }
+			}
+		},
+		"file-inclusion": {
+			"match": "^\\s*([<>]@?)\\s+(\\S.*)$",
+			"captures": {
+				"1": { "name": "keyword.operator.file.http" },
+				"2": { "name": "string.unquoted.path.http", "patterns": [{ "include": "#variable" }] }
+			}
+		},
+		"request-line": {
+			"patterns": [
+				{
+					"match": "^(?:(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|TRACE|CONNECT|[A-Z][A-Z]+)\\s+)(\\S+?)(?:\\s+(HTTP/[\\d.]+))?\\s*$",
+					"captures": {
+						"1": { "name": "keyword.control.http" },
+						"2": { "name": "markup.underline.link.http", "patterns": [{ "include": "#variable" }] },
+						"3": { "name": "constant.language.http-version.http" }
+					}
+				},
+				{
+					"match": "^((?:https?://|\\{\\{)\\S+?)(?:\\s+(HTTP/[\\d.]+))?\\s*$",
+					"captures": {
+						"1": { "name": "markup.underline.link.http", "patterns": [{ "include": "#variable" }] },
+						"2": { "name": "constant.language.http-version.http" }
+					}
+				}
+			]
+		},
+		"header": {
+			"match": "^([A-Za-z0-9!#$%&'*+.^_`|~-]+)\\s*(:)\\s*(.*)$",
+			"captures": {
+				"1": { "name": "support.type.property-name.header.http" },
+				"2": { "name": "punctuation.separator.key-value.http" },
+				"3": { "name": "string.unquoted.header-value.http", "patterns": [{ "include": "#variable" }] }
+			}
+		},
+		"json": {
+			"patterns": [
+				{
+					"begin": "(\")(?=(?:[^\"\\\\]|\\\\.)*\"\\s*:)",
+					"end": "\"",
+					"name": "support.type.property-name.json",
+					"patterns": [{ "include": "#variable" }, { "match": "\\\\.", "name": "constant.character.escape.json" }]
+				},
+				{
+					"begin": "\"",
+					"end": "\"",
+					"name": "string.quoted.double.json",
+					"patterns": [{ "include": "#variable" }, { "match": "\\\\.", "name": "constant.character.escape.json" }]
+				},
+				{ "match": "-?\\b\\d+(\\.\\d+)?([eE][+-]?\\d+)?\\b", "name": "constant.numeric.json" },
+				{ "match": "\\b(true|false|null)\\b", "name": "constant.language.json" }
+			]
+		},
+		"variable": {
+			"patterns": [
+				{
+					"match": "(\\{\\{)\\s*(\\$[^}]*?)\\s*(\\}\\})",
+					"captures": {
+						"1": { "name": "punctuation.definition.variable.begin.http" },
+						"2": { "name": "variable.language.dynamic.http" },
+						"3": { "name": "punctuation.definition.variable.end.http" }
+					}
+				},
+				{
+					"match": "(\\{\\{)\\s*([^}]*?)\\s*(\\}\\})",
+					"captures": {
+						"1": { "name": "punctuation.definition.variable.begin.http" },
+						"2": { "name": "variable.other.http" },
+						"3": { "name": "punctuation.definition.variable.end.http" }
+					}
+				}
+			]
+		}
+	}
+}

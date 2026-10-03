@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature id="org.eclipse.ehttpeditor.feature">
+      <category name="org.eclipse.ehttpeditor"/>
+   </feature>
+   <category-def name="org.eclipse.ehttpeditor" label="EHttpEditor"/>
+   <!-- TM4E and the Generic Editor come from the Eclipse release. -->
+   <repository-reference location="https://download.eclipse.org/releases/latest" enabled="true"/>
+</site>

@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <!-- The .http and .rest files, edited with the Generic Editor and colored by TM4E -->
+   <extension point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            id="http"
+            base-type="org.eclipse.core.runtime.text"
+            file-extensions="http,rest"
+            name="%contentType.http"
+            priority="normal"
+            default-charset="UTF-8">
+      </content-type>
+   </extension>
+
+   <extension point="org.eclipse.ui.editors">
+      <editorContentTypeBinding
+            contentTypeId="org.eclipse.ehttpeditor.http"
+            editorId="org.eclipse.ui.genericeditor.GenericEditor">
+      </editorContentTypeBinding>
+   </extension>
+
+   <extension point="org.eclipse.tm4e.registry.grammars">
+      <grammar
+            scopeName="source.http"
+            path="syntaxes/http.tmLanguage.json">
+      </grammar>
+      <scopeNameContentTypeBinding
+            contentTypeId="org.eclipse.ehttpeditor.http"
+            scopeName="source.http">
+      </scopeNameContentTypeBinding>
+   </extension>
+
+   <extension point="org.eclipse.tm4e.languageconfiguration.languageConfigurations">
+      <languageConfiguration
+            contentTypeId="org.eclipse.ehttpeditor.http"
+            path="language-configurations/language-configuration.json">
+      </languageConfiguration>
+   </extension>
+
+   <!-- TM4E colors the text content types of the Generic Editor which have a grammar: nothing more to declare. -->
+
+   <extension point="org.eclipse.ui.genericeditor.contentAssistProcessors">
+      <contentAssistProcessor
+            class="org.eclipse.ehttpeditor.ui.editor.HttpContentAssistProcessor"
+            contentType="org.eclipse.ehttpeditor.http">
+      </contentAssistProcessor>
+   </extension>
+
+   <extension point="org.eclipse.ui.genericeditor.hoverProviders">
+      <hoverProvider
+            class="org.eclipse.ehttpeditor.ui.editor.HttpTextHover"
+            contentType="org.eclipse.ehttpeditor.http"
+            id="org.eclipse.ehttpeditor.hover">
+      </hoverProvider>
+   </extension>
+
+   <!--
+      The provider checks itself that the document is an HTTP file (an enabledWhen on IFile would leave out the
+      files outside of the workspace). The reconciler computes the minings again when the text changes.
+   -->
+   <extension point="org.eclipse.ui.workbench.texteditor.codeMiningProviders">
+      <codeMiningProvider
+            class="org.eclipse.ehttpeditor.ui.editor.HttpCodeMiningProvider"
+            id="org.eclipse.ehttpeditor.codeMining"
+            label="%codeMining.label">
+      </codeMiningProvider>
+   </extension>
+
+   <extension point="org.eclipse.ui.genericeditor.reconcilers">
+      <reconciler
+            class="org.eclipse.jface.text.codemining.CodeMiningReconciler"
+            contentType="org.eclipse.ehttpeditor.http">
+      </reconciler>
+   </extension>
+
+   <!-- The view of the responses -->
+   <extension point="org.eclipse.ui.views">
+      <category
+            id="org.eclipse.ehttpeditor"
+            name="%category.name">
+      </category>
+      <view
+            category="org.eclipse.ehttpeditor"
+            class="org.eclipse.ehttpeditor.ui.HttpResponseView"
+            icon="icons/ehttpeditor.png"
+            id="org.eclipse.ehttpeditor.views.response"
+            name="%view.name">
+      </view>
+   </extension>
+
+   <extension point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension targetID="*">
+         <view
+               id="org.eclipse.ehttpeditor.views.response"
+               minimized="false"
+               relationship="stack"
+               relative="org.eclipse.ui.console.ConsoleView"
+               visible="false">
+         </view>
+      </perspectiveExtension>
+   </extension>
+
+   <!-- Commands -->
+   <extension point="org.eclipse.ui.commands">
+      <category
+            id="org.eclipse.ehttpeditor.commands"
+            name="%category.name">
+      </category>
+      <command
+            categoryId="org.eclipse.ehttpeditor.commands"
+            id="org.eclipse.ehttpeditor.commands.runRequest"
+            name="%command.runRequest"
+            description="%command.runRequest.description">
+      </command>
+      <command
+            categoryId="org.eclipse.ehttpeditor.commands"
+            id="org.eclipse.ehttpeditor.commands.runAllRequests"
+            name="%command.runAllRequests"
+            description="%command.runAllRequests.description">
+      </command>
+      <command
+            categoryId="org.eclipse.ehttpeditor.commands"
+            id="org.eclipse.ehttpeditor.commands.selectEnvironment"
+            name="%command.selectEnvironment"
+            description="%command.selectEnvironment.description">
+      </command>
+   </extension>
+
+   <extension point="org.eclipse.ui.handlers">
+      <handler
+            class="org.eclipse.ehttpeditor.ui.handlers.RunRequestHandler"
+            commandId="org.eclipse.ehttpeditor.commands.runRequest">
+         <activeWhen>
+            <reference definitionId="org.eclipse.ehttpeditor.httpEditorActive"/>
+         </activeWhen>
+      </handler>
+      <handler
+            class="org.eclipse.ehttpeditor.ui.handlers.RunRequestHandler"
+            commandId="org.eclipse.ehttpeditor.commands.runAllRequests">
+         <activeWhen>
+            <reference definitionId="org.eclipse.ehttpeditor.httpEditorActive"/>
+         </activeWhen>
+      </handler>
+      <handler
+            class="org.eclipse.ehttpeditor.ui.handlers.SelectEnvironmentHandler"
+            commandId="org.eclipse.ehttpeditor.commands.selectEnvironment">
+      </handler>
+   </extension>
+
+   <extension point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="org.eclipse.ehttpeditor.ui.editor.HttpFilePropertyTester"
+            id="org.eclipse.ehttpeditor.httpFileTester"
+            namespace="org.eclipse.ehttpeditor"
+            properties="httpFile"
+            type="org.eclipse.ui.IEditorInput">
+      </propertyTester>
+   </extension>
+
+   <extension point="org.eclipse.core.expressions.definitions">
+      <definition id="org.eclipse.ehttpeditor.httpEditorActive">
+         <with variable="activeEditorInput">
+            <test property="org.eclipse.ehttpeditor.httpFile" forcePluginActivation="true"/>
+         </with>
+      </definition>
+   </extension>
+
+   <extension point="org.eclipse.ui.contexts">
+      <context
+            id="org.eclipse.ehttpeditor.editorScope"
+            name="%context.name"
+            description="%context.description"
+            parentId="org.eclipse.ui.textEditorScope">
+      </context>
+   </extension>
+
+   <extension point="org.eclipse.ui.bindings">
+      <key
+            commandId="org.eclipse.ehttpeditor.commands.runRequest"
+            contextId="org.eclipse.ehttpeditor.editorScope"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+ENTER">
+      </key>
+      <key
+            commandId="org.eclipse.ehttpeditor.commands.runAllRequests"
+            contextId="org.eclipse.ehttpeditor.editorScope"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+ENTER">
+      </key>
+      <key
+            commandId="org.eclipse.ehttpeditor.commands.selectEnvironment"
+            contextId="org.eclipse.ehttpeditor.editorScope"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M3+E">
+      </key>
+   </extension>
+
+   <extension point="org.eclipse.ui.startup">
+      <startup class="org.eclipse.ehttpeditor.ui.editor.HttpEditorContextActivator"/>
+   </extension>
+
+   <extension point="org.eclipse.ui.menus">
+      <menuContribution locationURI="popup:#TextEditorContext?after=additions">
+         <separator name="org.eclipse.ehttpeditor.separator" visible="true"/>
+         <command
+               commandId="org.eclipse.ehttpeditor.commands.runRequest"
+               icon="icons/run.png"
+               style="push">
+            <visibleWhen checkEnabled="false">
+               <reference definitionId="org.eclipse.ehttpeditor.httpEditorActive"/>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.ehttpeditor.commands.runAllRequests"
+               style="push">
+            <visibleWhen checkEnabled="false">
+               <reference definitionId="org.eclipse.ehttpeditor.httpEditorActive"/>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.ehttpeditor.commands.selectEnvironment"
+               icon="icons/environment.png"
+               style="push">
+            <visibleWhen checkEnabled="false">
+               <reference definitionId="org.eclipse.ehttpeditor.httpEditorActive"/>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+   </extension>
+
+   <extension point="org.eclipse.ui.newWizards">
+      <category
+            id="org.eclipse.ehttpeditor"
+            name="%category.name">
+      </category>
+      <wizard
+            category="org.eclipse.ehttpeditor"
+            class="org.eclipse.ehttpeditor.ui.NewHttpFileWizard"
+            icon="icons/ehttpeditor.png"
+            id="org.eclipse.ehttpeditor.wizards.newHttpFile"
+            name="%wizard.name">
+         <description>%wizard.description</description>
+      </wizard>
+   </extension>
+
+   <extension point="org.eclipse.ui.preferencePages">
+      <page
+            class="org.eclipse.ehttpeditor.ui.HttpPreferencePage"
+            id="org.eclipse.ehttpeditor.preferences"
+            name="%category.name">
+      </page>
+   </extension>
+
+   <extension point="org.eclipse.core.runtime.preferences">
+      <initializer class="org.eclipse.ehttpeditor.PreferenceInitializer"/>
+   </extension>
+
+</plugin>

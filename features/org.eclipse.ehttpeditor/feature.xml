@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.eclipse.ehttpeditor.feature"
+      label="EHttpEditor"
+      version="1.0.0.qualifier">
+
+   <description url="https://github.com/RoiSoleil/ehttpeditor">
+      An HTTP client in the editor: write requests in .http files, run them and see the responses, with
+      environments, variables, response handlers and tests in JavaScript.
+   </description>
+
+   <license url="http://www.eclipse.org/legal/epl-v20.html">
+      Eclipse Public License, v2.0
+   </license>
+
+   <requires>
+      <import plugin="org.eclipse.ui.genericeditor"/>
+      <import plugin="org.eclipse.tm4e.ui"/>
+      <import plugin="org.eclipse.tm4e.registry"/>
+      <import plugin="org.eclipse.tm4e.languageconfiguration"/>
+   </requires>
+
+   <plugin
+         id="org.eclipse.ehttpeditor"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.mozilla.rhino"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>
