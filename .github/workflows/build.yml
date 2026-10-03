@@ -29,19 +29,44 @@ jobs:
            restore-keys: |
              ${{ runner.os }}-maven-
       -  name: Build
-         run: mvn -B clean install
-      -  name: Upload coverage to Codecov
+         # The end-to-end tests drive a real workbench with SWTBot: they need a display.
+         run: |
+            set -o pipefail
+            xvfb-run -a mvn -B clean install 2>&1 | tee build.log
+      -  name: Upload the coverage to Codecov
          if: always()
          uses: codecov/codecov-action@v7
          with:
             files: tests/org.eclipse.ehttpeditor.coverage/target/site/jacoco-aggregate/jacoco.xml
             token: ${{ secrets.CODECOV_TOKEN }}
+      -  name: Report the failure
+         # The failure as annotations of the run: readable with the REST API of GitHub.
+         if: failure()
+         run: |
+            annotate() { python3 -c 'import sys,urllib.parse; d=sys.stdin.read()[-60000:]; print("::error title='"$1"'::" + d.replace("%","%25").replace("\r","").replace("\n","%0A"))'; }
+            grep -E "\[ERROR\]|Tests run:|FAIL" build.log | head -150 | annotate "Maven errors"
+            for f in tests/*/target/surefire-reports/*.txt; do [ -f "$f" ] && cat "$f" | annotate "$(basename $f)"; done
+            for f in tests/*/target/work/data/.metadata/.log; do
+               [ -f "$f" ] || continue
+               # the errors of the Eclipse log, one annotation per entry (annotations are short)
+               python3 - "$f" <<'PY'
+            import re, sys
+            entries = re.split(r"\n(?=!ENTRY )", open(sys.argv[1]).read())
+            picked = [e for e in entries if e.startswith("!ENTRY") and (" 4 " in e.split("\n")[0] or "ehttpeditor" in e.lower())]
+            for e in picked[-6:]:
+                print("::error title=Eclipse log::" + e[:3500].replace("%", "%25").replace("\r", "").replace("\n", "%0A"))
+            PY
+            done
+            true
       -  name: Upload the test reports
          if: failure()
          uses: actions/upload-artifact@v7
          with:
-            name: surefire-reports
-            path: tests/org.eclipse.ehttpeditor.tests/target/surefire-reports
+            name: test-reports
+            path: |
+               tests/*/target/surefire-reports
+               tests/*/target/screenshots
+               tests/*/target/work/data/.metadata/.log
       -  name: Release
          if: github.event_name == 'push'
          env:
@@ -57,7 +82,11 @@ jobs:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
          run: |
             remote="https://x-access-token:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY"
-            git clone --depth 1 --branch update-site "$remote" site
+            if ! git clone --depth 1 --branch update-site "$remote" site; then
+               mkdir site
+               git -C site init -b update-site
+               git -C site remote add origin "$remote"
+            fi
             rm -rf site/latest
             mkdir -p site/latest
             cp -r update-site/org.eclipse.ehttpeditor/target/repository/* site/latest/

@@ -1,0 +1,38 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.eclipse.ehttpeditor</groupId>
+		<artifactId>org.eclipse.ehttpeditor.releng</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../../releng</relativePath>
+	</parent>
+	<artifactId>org.eclipse.ehttpeditor.ui.tests</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>eclipse-test-plugin</packaging>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-surefire-plugin</artifactId>
+				<version>${tycho.version}</version>
+				<configuration>
+					<!-- SWTBot drives a real workbench: it needs a display (xvfb-run on a server). -->
+					<useUIHarness>true</useUIHarness>
+					<useUIThread>false</useUIThread>
+					<!-- SWTBot brings JUnit 4 too: the tests are JUnit 5 -->
+					<providerHint>junit5</providerHint>
+					<showEclipseLog>true</showEclipseLog>
+					<application>org.eclipse.ui.ide.workbench</application>
+					<argLine>${tycho.testArgLine} -Dorg.eclipse.swtbot.screenshots.dir=${project.build.directory}/screenshots -Dorg.eclipse.swtbot.search.timeout=20000</argLine>
+					<bundleStartLevel>
+						<bundle>
+							<id>org.apache.felix.scr</id>
+							<level>2</level>
+							<autoStart>true</autoStart>
+						</bundle>
+					</bundleStartLevel>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

@@ -88,9 +88,19 @@ with Tycho).
 mvn clean install   # update site in update-site/org.eclipse.ehttpeditor/target/repository
 ```
 
-The tests drive the parser, the variables, the HTTP client (against a local server) and the scripts, without a
-workbench. JaCoCo measures their coverage; `tests/org.eclipse.ehttpeditor.coverage` writes the report in
-`target/site/jacoco-aggregate` and GitHub Actions sends it to [Codecov](https://codecov.io/gh/RoiSoleil/ehttpeditor).
+The tests:
+
+- `tests/org.eclipse.ehttpeditor.tests` drives the parser, the variables, the HTTP client (against a local server)
+  and the scripts, without a workbench.
+- `tests/org.eclipse.ehttpeditor.ui.tests` is end-to-end, with SWTBot: a user creates an .http file with the wizard,
+  chooses the environment, runs the requests from the context menu, the key bindings and the code minings against a
+  local server, reads the responses and the tests in the view, runs a request again, uses the completion and the
+  hover of the variables and opens the preferences. A window opens on the current display (use `xvfb-run` on a
+  server); `-DskipTests` skips the tests.
+
+JaCoCo measures the coverage of the plug-in by all the tests; `tests/org.eclipse.ehttpeditor.coverage` writes the
+report in `target/site/jacoco-aggregate` and GitHub Actions sends it to
+[Codecov](https://codecov.io/gh/RoiSoleil/ehttpeditor).
 
 The icons are drawn by `tools/MakeIcon.java` (the view icon is the same drawing as `icons/ehttpeditor.svg`):
 
