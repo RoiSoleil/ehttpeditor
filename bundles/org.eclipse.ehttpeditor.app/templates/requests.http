@@ -1,0 +1,45 @@
+# Welcome to EHttpEditor!
+#
+# This file holds HTTP requests. Each request starts with a line "###" (followed by an optional name), then:
+#   - the request line: the method (GET when it is left out) and the URL;
+#   - the headers, one "Name: value" a line;
+#   - an empty line, then the body (for POST, PUT, PATCH...).
+#
+# To run a request, click "Send request" above it, or put the cursor in it and press Ctrl+Enter
+# (Ctrl+Shift+Enter runs all the requests of the file). The response shows in the HTTP Client view below:
+# body, headers, the request sent, the results of the tests and the console of the scripts.
+#
+# Lines starting with # or // are comments. The guide: Help > Documentation.
+
+# A variable: "@name = value", used as {{name}} in the requests below it.
+@host = https://httpbin.org
+
+### A simple GET
+# The query parameters can be written on several lines, starting with ? and &: they are encoded for you.
+# {{$uuid}} is a dynamic variable: a new random value each time the request runs.
+GET {{host}}/get
+    ?search=eclipse http
+    &id={{$uuid}}
+Accept: application/json
+
+### A POST with a JSON body and a test
+# The body comes after the empty line. {{$isoTimestamp}} is the current date and time.
+POST {{host}}/post
+Content-Type: application/json
+
+{
+  "name": "EHttpEditor",
+  "time": "{{$isoTimestamp}}"
+}
+
+# A response handler: JavaScript run after the response is received. client.test adds a test to the Tests tab,
+# and client.global.set keeps a value for the next requests, as {{name}}.
+> {%
+client.test("The request succeeded", function () {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+client.global.set("name", response.body.json.name);
+%}
+
+### Uses the value kept by the previous request (run the POST first)
+GET {{host}}/anything/{{name}}

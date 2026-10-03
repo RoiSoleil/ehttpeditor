@@ -107,7 +107,8 @@ jobs:
             gh release delete latest --yes --cleanup-tag || true
             gh release create latest --prerelease --title "Development Build" --target "$GITHUB_SHA" \
                --notes "Latest build of the main branch." \
-               update-site/org.eclipse.ehttpeditor/target/org.eclipse.ehttpeditor.updatesite-*-SNAPSHOT.zip
+               update-site/org.eclipse.ehttpeditor/target/org.eclipse.ehttpeditor.updatesite-*-SNAPSHOT.zip \
+               products/org.eclipse.ehttpeditor.product/target/products/ehttpeditor-*
       -  name: Publish p2 update site
          if: github.event_name == 'push'
          env:
