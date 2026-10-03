@@ -468,6 +468,38 @@ class EHttpEditorEndToEndTest {
 		editor.close();
 	}
 
+	@Test
+	void theEnvironmentsAreTheOnesOfTheActiveEnvironmentFileOrOfAnOpenHttpEditor() throws Exception {
+		// The active editor is the environment file: the environments of its folder
+		openInTextEditor(project.getFile(Environments.PUBLIC_FILE));
+		assertEquals(List.of("local", "prod"), activeEnvironments());
+
+		// Another file is active: the environments of the open HTTP editor
+		SWTBotEclipseEditor http = open("requests.http", "GET {{base}}/items/42\n");
+		openInTextEditor(write("notes.txt", "notes"));
+		assertEquals(List.of("local", "prod"), activeEnvironments());
+
+		// Without HTTP editor: no environment
+		http.close();
+		assertEquals(null, UIThreadRunnable.syncExec(() -> EnvironmentSelection.activeDocument()));
+	}
+
+	private void openInTextEditor(IFile file) {
+		UIThreadRunnable.syncExec(() -> {
+			try {
+				IDE.openEditor(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(), file,
+						"org.eclipse.ui.DefaultTextEditor", true);
+			} catch (CoreException e) {
+				throw new IllegalStateException(e);
+			}
+		});
+		waitFor("the editor of " + file.getName(), () -> editor(file.getName())).show();
+	}
+
+	private static List<String> activeEnvironments() {
+		return UIThreadRunnable.syncExec(() -> EnvironmentSelection.activeDocument().environments().names());
+	}
+
 	private static IRegion lineOf(ITextViewer viewer, int line) {
 		try {
 			return viewer.getDocument().getLineInformation(line);

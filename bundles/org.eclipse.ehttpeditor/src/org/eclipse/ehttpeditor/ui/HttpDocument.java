@@ -1,6 +1,7 @@
 package org.eclipse.ehttpeditor.ui;
 
 import java.io.File;
+import java.util.List;
 import java.util.Locale;
 
 import org.eclipse.core.filebuffers.FileBuffers;
@@ -89,6 +90,30 @@ public record HttpDocument(String name, File file, IFile workspace, File baseDir
 			return of(new File(uriInput.getURI()));
 		}
 		return isHttpFileName(input.getName()) ? new HttpDocument(input.getName(), null, null, null, null) : null;
+	}
+
+	/**
+	 * For an environment file (http-client.env.json, http-client.private.env.json): a document of its folder, which
+	 * has the environments of the HTTP files of this folder. Null for another file.
+	 */
+	public static HttpDocument ofEnvironmentFile(IEditorInput input) {
+		if (input == null || !List.of(Environments.PUBLIC_FILE, Environments.PRIVATE_FILE).contains(input.getName())) {
+			return null;
+		}
+		IFile file = input.getAdapter(IFile.class);
+		IPath location = file != null ? file.getLocation() : null;
+		if (location != null) {
+			File dir = location.toFile().getParentFile();
+			IPath projectLocation = file.getProject().getLocation();
+			return new HttpDocument(file.getName(), location.toFile(), file, dir,
+					projectLocation != null ? projectLocation.toFile() : dir);
+		}
+		if (input instanceof IURIEditorInput uriInput && "file".equals(uriInput.getURI().getScheme())) {
+			File local = new File(uriInput.getURI());
+			File dir = local.getAbsoluteFile().getParentFile();
+			return new HttpDocument(local.getName(), local, null, dir, dir);
+		}
+		return null;
 	}
 
 	private static HttpDocument of(IFile file) {
