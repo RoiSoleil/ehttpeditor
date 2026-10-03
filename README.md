@@ -79,6 +79,26 @@ https://github.com/RoiSoleil/ehttpeditor/raw/update-site/latest/
 
 EHttpEditor needs TM4E (TextMate support, in the Eclipse release update site, already in most packages of the Eclipse IDE).
 
+# Standalone application
+
+EHttpEditor is also packaged alone, without the rest of the Eclipse IDE: a small application (about 50 MB) with
+only the HTTP client, the Project Explorer and the text editors. Download the archive of your platform from the
+[latest build](https://github.com/RoiSoleil/ehttpeditor/releases/tag/latest), extract it and run `ehttpeditor`:
+
+| Platform | Archive |
+| --- | --- |
+| Windows x86_64 | [ehttpeditor-win32.win32.x86_64.zip](https://github.com/RoiSoleil/ehttpeditor/releases/download/latest/ehttpeditor-win32.win32.x86_64.zip) |
+| Linux x86_64 | [ehttpeditor-linux.gtk.x86_64.tar.gz](https://github.com/RoiSoleil/ehttpeditor/releases/download/latest/ehttpeditor-linux.gtk.x86_64.tar.gz) |
+| Linux aarch64 | [ehttpeditor-linux.gtk.aarch64.tar.gz](https://github.com/RoiSoleil/ehttpeditor/releases/download/latest/ehttpeditor-linux.gtk.aarch64.tar.gz) |
+| macOS x86_64 | [ehttpeditor-macosx.cocoa.x86_64.tar.gz](https://github.com/RoiSoleil/ehttpeditor/releases/download/latest/ehttpeditor-macosx.cocoa.x86_64.tar.gz) |
+| macOS aarch64 (Apple silicon) | [ehttpeditor-macosx.cocoa.aarch64.tar.gz](https://github.com/RoiSoleil/ehttpeditor/releases/download/latest/ehttpeditor-macosx.cocoa.aarch64.tar.gz) |
+
+- It needs Java 21 or later, installed (not included, to keep the archive small): the one of the `PATH`, or the one
+  set with `-vm` in `ehttpeditor.ini`.
+- The files are opened with *File > Open File...* or from the projects of the workspace
+  (`ehttpeditor-workspace` in the home folder; *File > Switch Workspace* to change it).
+- macOS: the application is not signed; after the extraction, `xattr -cr EHttpEditor.app` lets it start.
+
 # Build
 
 Requires JDK 21 and Maven 3.9 (the Apache distribution: the Maven packaged by some Linux distributions does not work
@@ -87,6 +107,8 @@ with Tycho).
 ```bash
 mvn clean install   # update site in update-site/org.eclipse.ehttpeditor/target/repository
 ```
+
+The standalone application is in `products/org.eclipse.ehttpeditor.product/target/products`, an archive by platform.
 
 The tests:
 
@@ -106,6 +128,14 @@ The icons are drawn by `tools/MakeIcon.java` (the view icon is the same drawing 
 
 ```bash
 java tools/MakeIcon.java ehttpeditor 16 bundles/org.eclipse.ehttpeditor/icons/ehttpeditor.png
+```
+
+The icons of the standalone application are the same drawing: `bundles/org.eclipse.ehttpeditor.branding/icons`
+(`ehttpeditor16.png` to `ehttpeditor256.png`, drawn by `MakeIcon.java`), and the icons of the launchers (`.ico`,
+`.icns`, `.xpm`) written from them:
+
+```bash
+java tools/MakeLauncherIcons.java bundles/org.eclipse.ehttpeditor.branding/icons products/org.eclipse.ehttpeditor.product/icons
 ```
 
 # License

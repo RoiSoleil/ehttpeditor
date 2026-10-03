@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <!--
+      The standalone EHttpEditor: the workbench of the IDE (Project Explorer, File > Open File...) with only
+      the HTTP client.
+   -->
+   <extension id="product" point="org.eclipse.core.runtime.products">
+      <product
+            application="org.eclipse.ui.ide.workbench"
+            name="%productName">
+         <property name="appName" value="%productName"/>
+         <property name="windowImages"
+               value="icons/ehttpeditor16.png,icons/ehttpeditor32.png,icons/ehttpeditor48.png,icons/ehttpeditor64.png,icons/ehttpeditor128.png,icons/ehttpeditor256.png"/>
+         <property name="aboutImage" value="icons/ehttpeditor128.png"/>
+         <property name="aboutText" value="%productBlurb"/>
+         <property name="preferenceCustomization" value="plugin_customization.ini"/>
+      </product>
+   </extension>
+
+</plugin>

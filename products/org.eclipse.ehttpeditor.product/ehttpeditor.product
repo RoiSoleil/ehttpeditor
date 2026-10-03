@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?pde version="3.5"?>
+
+<!--
+   The standalone EHttpEditor: the smallest workbench which opens and runs the .http files. Only the roots are
+   listed: the other bundles (the workbench of the IDE, the Project Explorer, the Generic Editor, Rhino...) are their
+   requirements, added by p2. A feature such as org.eclipse.e4.rcp would bring bundles which are not used (the OSGi
+   console, ASM...).
+-->
+<product name="EHttpEditor" uid="org.eclipse.ehttpeditor.product" id="org.eclipse.ehttpeditor.branding.product"
+      application="org.eclipse.ui.ide.workbench" version="1.0.0.qualifier" type="bundles" includeLaunchers="true"
+      autoIncludeRequirements="true">
+
+   <configIni use="default">
+   </configIni>
+
+   <launcherArgs>
+      <!-- No workspace chooser: the workspace of the HTTP files -->
+      <programArgs>-data @user.home/ehttpeditor-workspace
+      </programArgs>
+      <vmArgs>-Xms64m -Xmx512m
+      </vmArgs>
+      <vmArgsMac>-XstartOnFirstThread
+      </vmArgsMac>
+   </launcherArgs>
+
+   <launcher name="ehttpeditor">
+      <linux icon="icons/ehttpeditor.xpm"/>
+      <macosx icon="icons/ehttpeditor.icns"/>
+      <win useIco="true">
+         <ico path="icons/ehttpeditor.ico"/>
+         <bmp/>
+      </win>
+   </launcher>
+
+   <vm>
+   </vm>
+
+   <plugins>
+      <plugin id="org.eclipse.ehttpeditor"/>
+      <!-- The product, its icons, the workbench of the IDE and the Project Explorer -->
+      <plugin id="org.eclipse.ehttpeditor.branding"/>
+      <!-- The coloring of the .http files (the plug-in declares its grammar without requiring TM4E) -->
+      <plugin id="org.eclipse.tm4e.ui"/>
+      <plugin id="org.eclipse.tm4e.registry"/>
+      <plugin id="org.eclipse.tm4e.languageconfiguration"/>
+      <!-- The light and dark themes of Eclipse -->
+      <plugin id="org.eclipse.ui.themes"/>
+      <plugin id="org.eclipse.e4.ui.css.swt.theme"/>
+      <!-- The runtime: declarative services, events, the drag and drop and the minimize/maximize of the parts -->
+      <plugin id="org.apache.felix.scr"/>
+      <plugin id="org.eclipse.equinox.event"/>
+      <plugin id="org.eclipse.equinox.simpleconfigurator"/>
+      <plugin id="org.eclipse.osgi.compatibility.state" fragment="true"/>
+      <plugin id="org.eclipse.e4.ui.workbench.addons.swt"/>
+      <!-- The icons of the platform are SVG -->
+      <plugin id="org.eclipse.swt.svg"/>
+      <plugin id="org.eclipse.equinox.launcher"/>
+      <plugin id="org.eclipse.equinox.launcher.gtk.linux.x86_64" fragment="true" os="linux" ws="gtk" arch="x86_64"/>
+      <plugin id="org.eclipse.equinox.launcher.gtk.linux.aarch64" fragment="true" os="linux" ws="gtk" arch="aarch64"/>
+      <plugin id="org.eclipse.equinox.launcher.cocoa.macosx.x86_64" fragment="true" os="macosx" ws="cocoa" arch="x86_64"/>
+      <plugin id="org.eclipse.equinox.launcher.cocoa.macosx.aarch64" fragment="true" os="macosx" ws="cocoa" arch="aarch64"/>
+      <plugin id="org.eclipse.equinox.launcher.win32.win32.x86_64" fragment="true" os="win32" ws="win32" arch="x86_64"/>
+      <plugin id="org.eclipse.e4.ui.workbench.renderers.swt.cocoa" fragment="true" os="macosx" ws="cocoa"/>
+   </plugins>
+
+   <configurations>
+      <plugin id="org.apache.felix.scr" autoStart="true" startLevel="2"/>
+      <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="4"/>
+      <plugin id="org.eclipse.equinox.common" autoStart="true" startLevel="2"/>
+      <plugin id="org.eclipse.equinox.event" autoStart="true" startLevel="2"/>
+      <plugin id="org.eclipse.equinox.simpleconfigurator" autoStart="true" startLevel="1"/>
+   </configurations>
+
+</product>

@@ -15,6 +15,8 @@
 		<module>tests/org.eclipse.ehttpeditor.ui.tests</module>
 		<module>features/org.eclipse.ehttpeditor</module>
 		<module>update-site/org.eclipse.ehttpeditor</module>
+		<module>bundles/org.eclipse.ehttpeditor.branding</module>
+		<module>products/org.eclipse.ehttpeditor.product</module>
 		<module>tests/org.eclipse.ehttpeditor.coverage</module>
 	</modules>
 </project>
