@@ -34,10 +34,10 @@ jobs:
             set -o pipefail
             xvfb-run -a mvn -B clean install 2>&1 | tee build.log
       -  name: Upload the coverage to Codecov
-         if: always()
          uses: codecov/codecov-action@v7
          with:
             files: tests/org.eclipse.ehttpeditor.coverage/target/site/jacoco-aggregate/jacoco.xml
+            fail_ci_if_error: true
             token: ${{ secrets.CODECOV_TOKEN }}
       -  name: Report the failure
          # The failure as annotations of the run: readable with the REST API of GitHub.
