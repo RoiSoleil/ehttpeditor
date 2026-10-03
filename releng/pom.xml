@@ -9,7 +9,10 @@
 		<tycho.version>5.0.4</tycho.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<eclipse-repo.url>https://download.eclipse.org/releases/latest</eclipse-repo.url>
-		<!-- The last Rhino whose jar is an OSGi bundle (1.8 has no manifest headers): ES6 enough for the scripts. -->
+		<!--
+			Fallback for Rhino: the release repository of Eclipse has a newer org.mozilla.rhino (Orbit, 1.9.x in
+			2026-09), which the feature takes. 1.7.15 is the last jar of Maven Central which is an OSGi bundle.
+		-->
 		<rhino.version>1.7.15</rhino.version>
 		<jacoco.version>0.8.15</jacoco.version>
 		<!-- JaCoCo agent of the tests (set by jacoco:prepare-agent), used by tycho-surefire -->
