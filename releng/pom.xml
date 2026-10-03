@@ -13,7 +13,7 @@
 			Fallback for Rhino: the release repository of Eclipse has a newer org.mozilla.rhino (Orbit, 1.9.x in
 			2026-09), which the feature takes. 1.7.15 is the last jar of Maven Central which is an OSGi bundle.
 		-->
-		<rhino.version>1.7.15</rhino.version>
+		<rhino.version>1.9.1</rhino.version>
 		<jacoco.version>0.8.15</jacoco.version>
 		<!-- JaCoCo agent of the tests (set by jacoco:prepare-agent), used by tycho-surefire -->
 		<tycho.testArgLine></tycho.testArgLine>
