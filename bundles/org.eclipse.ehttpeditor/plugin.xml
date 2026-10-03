@@ -21,6 +21,14 @@
       </editorContentTypeBinding>
    </extension>
 
+   <!-- The icon of the HTTP files in the Project Explorer and on the tab of the Generic Editor -->
+   <extension point="org.eclipse.ui.genericeditor.icons">
+      <icon
+            contentType="org.eclipse.ehttpeditor.http"
+            icon="icons/ehttpeditor.png">
+      </icon>
+   </extension>
+
    <extension point="org.eclipse.tm4e.registry.grammars">
       <grammar
             scopeName="source.http"
