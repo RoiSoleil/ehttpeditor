@@ -33,6 +33,8 @@ Above each request, **▶ Send request** runs it (or **Ctrl+Enter** in it, **Ctr
 of the file). The response shows in the *HTTP Client* view: body (JSON indented and colored), headers, request sent,
 tests, console of the scripts, and the history of the session.
 
+![ehttpeditor](docs/screenshot.png)
+
 # Features
 
 - **Syntax** of IntelliJ: requests separated by `###`, the method optional (GET), the URL on several lines,
@@ -70,6 +72,11 @@ The timeouts, the User-Agent, the size of the history and the cookies kept are i
 Not supported yet: GraphQL, WebSocket and gRPC requests, `run` of other requests, the iterations of a request over
 an array, the OAuth 2.0 configuration of the environments, the client certificates, the XML body as a DOM in the
 handlers (it is a string).
+
+# Installation
+
+EHttpEditor is published on the Eclipse Marketplace (*Help > Eclipse Marketplace...*, search for EHttpEditor);
+the listing is described in [docs/marketplace.md](docs/marketplace.md).
 
 # Update Site
 
