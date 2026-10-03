@@ -95,11 +95,20 @@ public final class ScriptRunner {
 				// client.exit()
 				return;
 			}
+			cancelled(host);
 			throw new ScriptException(location(e) + e.details(), e);
 		} catch (RhinoException e) {
+			cancelled(host);
 			throw new ScriptException(location(e) + e.details(), e);
 		} finally {
 			Context.exit();
+		}
+	}
+
+	/** A cancellation caught and thrown again by a script (in client.test) is still a cancellation. */
+	private static void cancelled(ScriptHost host) {
+		if (host.cancelled()) {
+			throw new CancellationException("Script cancelled");
 		}
 	}
 

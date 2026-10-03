@@ -46,24 +46,38 @@ public final class ClientSession {
 
 	/** Saves the cookies which have not expired, one per line as JSON. */
 	public void saveCookies(File file) throws IOException {
-		List<String> lines = new ArrayList<>();
+		// The URI each cookie was received from, when the store still knows it (not for a Domain=... cookie).
+		Map<HttpCookie, URI> received = new java.util.IdentityHashMap<>();
 		for (URI uri : cookies.getCookieStore().getURIs()) {
 			for (HttpCookie cookie : cookies.getCookieStore().get(uri)) {
-				if (cookie.hasExpired() || cookie.getMaxAge() == -1) {
-					// Session cookies end with the session.
+				received.putIfAbsent(cookie, uri);
+			}
+		}
+		List<String> lines = new ArrayList<>();
+		for (HttpCookie cookie : cookies.getCookieStore().getCookies()) {
+			if (cookie.hasExpired() || cookie.getMaxAge() == -1) {
+				// Session cookies end with the session.
+				continue;
+			}
+			URI uri = received.get(cookie);
+			if (uri == null) {
+				if (cookie.getDomain() == null) {
 					continue;
 				}
-				Map<String, Object> map = new LinkedHashMap<>();
-				map.put("uri", uri.toString());
-				map.put("name", cookie.getName());
-				map.put("value", cookie.getValue());
-				map.put("domain", cookie.getDomain());
-				map.put("path", cookie.getPath());
-				map.put("expires", System.currentTimeMillis() / 1000 + cookie.getMaxAge());
-				map.put("secure", cookie.getSecure());
-				map.put("httpOnly", cookie.isHttpOnly());
-				lines.add(Json.stringify(map));
+				String host = cookie.getDomain().startsWith(".") ? cookie.getDomain().substring(1) : cookie.getDomain();
+				uri = URI.create((cookie.getSecure() ? "https://" : "http://") + host
+						+ (cookie.getPath() != null ? cookie.getPath() : "/"));
 			}
+			Map<String, Object> map = new LinkedHashMap<>();
+			map.put("uri", uri.toString());
+			map.put("name", cookie.getName());
+			map.put("value", cookie.getValue());
+			map.put("domain", cookie.getDomain());
+			map.put("path", cookie.getPath());
+			map.put("expires", System.currentTimeMillis() / 1000 + cookie.getMaxAge());
+			map.put("secure", cookie.getSecure());
+			map.put("httpOnly", cookie.isHttpOnly());
+			lines.add(Json.stringify(map));
 		}
 		File parent = file.getParentFile();
 		if (parent != null) {

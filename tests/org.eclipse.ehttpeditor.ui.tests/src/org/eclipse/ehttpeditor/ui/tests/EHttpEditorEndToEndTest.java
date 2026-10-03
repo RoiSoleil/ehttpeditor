@@ -22,6 +22,7 @@ import org.eclipse.ehttpeditor.core.Execution;
 import org.eclipse.ehttpeditor.ui.EnvironmentSelection;
 import org.eclipse.ehttpeditor.ui.HttpResponseView;
 import org.eclipse.ehttpeditor.ui.editor.HttpCodeMiningProvider;
+import org.eclipse.ehttpeditor.ui.editor.HttpContentAssistProcessor;
 import org.eclipse.ehttpeditor.ui.editor.HttpTextHover;
 import org.eclipse.ehttpeditor.ui.handlers.RunRequestHandler;
 import org.eclipse.ehttpeditor.ui.tests.TestServer.Response;
@@ -316,7 +317,183 @@ class EHttpEditorEndToEndTest {
 		preferences.bot().tree().select("HTTP Client");
 		assertEquals("30", preferences.bot().textWithLabel("Connection timeout (seconds):").getText());
 		assertEquals("60", preferences.bot().textWithLabel("Response timeout (seconds):").getText());
-		preferences.bot().button("Cancel").click();
+		preferences.bot().button("Apply and Close").click();
+		assertEquals(30, Activator.getDefault().getPreferenceStore().getInt(Activator.PREF_CONNECT_TIMEOUT));
+	}
+
+	@Test
+	void theCompletionKnowsEachPlaceOfARequest() throws Exception {
+		SWTBotEclipseEditor editor = open("completion.http", """
+				G
+				###
+				POST {{base}}/items
+				Acc
+				Content-Type: app
+				Authorization: B
+				# @no
+				X-Id: {{$ra
+
+				{"id": "{{na"}
+				""");
+		UIThreadRunnable.syncExec(() -> EnvironmentSelection.select("local"));
+		ITextViewer viewer = viewer("completion.http");
+		assertTrue(proposalsAt(viewer, 0, 1).contains("GET"));
+		assertTrue(proposalsAt(viewer, 1, 1).contains("###"), proposalsAt(viewer, 1, 1).toString());
+		assertEquals(List.of("Accept", "Accept-Charset", "Accept-Encoding", "Accept-Language"), proposalsAt(viewer, 3, 3));
+		assertEquals(List.of("application/json", "application/xml", "application/x-www-form-urlencoded",
+				"application/octet-stream", "application/graphql"), proposalsAt(viewer, 4, 17));
+		assertEquals(List.of("Basic", "Bearer"), proposalsAt(viewer, 5, 16));
+		assertEquals(List.of("@no-redirect", "@no-log", "@no-cookie-jar", "@no-auto-encoding"),
+				proposalsAt(viewer, 6, 5));
+		List<String> dynamic = proposalsAt(viewer, 7, 11);
+		assertTrue(dynamic.contains("$random.uuid") && dynamic.contains("$randomInt") && !dynamic.contains("$uuid"),
+				dynamic.toString());
+		// In the body, the variables only, of every source
+		Activator.getDefault().session().globals().put("nameOfGlobal", "g");
+		List<String> variables = proposalsAt(viewer, 9, 12);
+		assertEquals(List.of("nameOfGlobal - global variable"), variables);
+		// Nothing after the method and its space
+		assertTrue(proposalsAt(viewer, 2, 5).isEmpty());
+		// The proposal inserts the variable and closes it
+		UIThreadRunnable.syncExec(() -> {
+			IRegion line = lineOf(viewer, 9);
+			new HttpContentAssistProcessor().computeCompletionProposals(viewer, line.getOffset() + 12)[0]
+					.apply(viewer.getDocument());
+		});
+		assertTrue(editor.getText().contains("{\"id\": \"{{nameOfGlobal}}\"}"), editor.getText());
+		HttpContentAssistProcessor processor = new HttpContentAssistProcessor();
+		assertEquals("{@$", new String(processor.getCompletionProposalAutoActivationCharacters()));
+		assertEquals(null, processor.computeContextInformation(viewer, 0));
+		assertEquals(null, processor.getContextInformationAutoActivationCharacters());
+		assertEquals(null, processor.getErrorMessage());
+		assertEquals(null, processor.getContextInformationValidator());
+	}
+
+	@Test
+	void theHoverTellsWhereAValueComesFrom() throws Exception {
+		open("hover.http", """
+				@url = {{base}}/items
+				GET {{url}}/{{unknown}}/{{$uuid}}
+				""");
+		UIThreadRunnable.syncExec(() -> EnvironmentSelection.select("local"));
+		ITextViewer viewer = viewer("hover.http");
+		String line = "GET {{url}}/{{unknown}}/{{$uuid}}";
+		assertEquals("url = " + server.url() + "/items\n({{base}}/items)\nin-place variable",
+				hoverAt(viewer, 1, line.indexOf("url")));
+		assertEquals("unknown: unresolved variable (it may be set by a script: request.variables.set)",
+				hoverAt(viewer, 1, line.indexOf("unknown")));
+		assertTrue(hoverAt(viewer, 1, line.indexOf("$uuid")).startsWith("$uuid: dynamic variable, for example "));
+		assertEquals(null, hoverAt(viewer, 1, 1));
+	}
+
+	@Test
+	void theViewOpensTheResponseAndShowsTheErrors() throws Exception {
+		open("view-actions.http", """
+				### Json
+				GET {{base}}/items/42
+
+				### Refused
+				# @connection-timeout 2 s
+				GET http://127.0.0.1:1/
+				""");
+		UIThreadRunnable.syncExec(() -> EnvironmentSelection.select("local"));
+		execute(RunRequestHandler.COMMAND_RUN_ALL);
+		waitForExecutions(2);
+		SWTBotView view = bot.viewById(HttpResponseView.ID);
+		view.show();
+		SWTBotTable history = view.bot().table();
+		waitFor("the two executions", () -> history.rowCount() == 2 ? Boolean.TRUE : null);
+
+		// The error: no status, the console shows why
+		history.select(0);
+		assertEquals("Error", history.cell(0, 0));
+		String console = view.bot().styledText(0).getText();
+		assertTrue(console.contains("Connection refused"), console);
+
+		// The JSON response, opened in an editor
+		history.select(1);
+		view.bot().cTabItem("Response").activate();
+		assertTrue(view.bot().styledText(0).getText().contains("\"name\": \"ada\""));
+		view.viewMenu().menu("Wrap Lines").click();
+		assertTrue(view.bot().styledText(0).widget != null
+				&& UIThreadRunnable.syncExec(() -> view.bot().styledText(0).widget.getWordWrap()));
+		view.toolbarButton("Open Response in Editor").click();
+		SWTBotEditor response = waitFor("the response in an editor", () -> {
+			for (SWTBotEditor e : bot.editors()) {
+				if (e.getTitle().startsWith("Json-") && e.getTitle().endsWith(".json")) {
+					return e;
+				}
+			}
+			return null;
+		});
+		assertTrue(response.toTextEditor().getText().contains("\"id\": 42"), response.toTextEditor().getText());
+
+		// The environment, from the toolbar of the view
+		view.show();
+		view.toolbarButton("Environment: local (click to change)").click();
+		SWTBotShell dialog = bot.shell("HTTP Client Environment");
+		dialog.bot().table().select("No environment");
+		dialog.bot().button("OK").click();
+		assertEquals(null, Activator.getDefault().environment());
+
+		// Cookies and globals forgotten after a confirmation
+		Activator.getDefault().session().globals().put("g", "1");
+		view.viewMenu().menu("Clear Cookies and Global Variables...").click();
+		bot.shell("HTTP Client").bot().button("OK").click();
+		assertTrue(Activator.getDefault().session().globals().isEmpty());
+	}
+
+	@Test
+	void aFileOutsideOfTheWorkspaceUsesItsOwnEnvironments() throws Exception {
+		java.io.File dir = java.nio.file.Files.createTempDirectory("ehttp-outside").toFile();
+		java.nio.file.Files.writeString(new java.io.File(dir, Environments.PUBLIC_FILE).toPath(),
+				"{ \"local\": { \"base\": \"" + server.url() + "\" } }");
+		java.io.File file = new java.io.File(dir, "outside.http");
+		java.nio.file.Files.writeString(file.toPath(), "GET {{base}}/items/42\n");
+		UIThreadRunnable.syncExec(() -> {
+			try {
+				IDE.openEditorOnFileStore(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(),
+						org.eclipse.core.filesystem.EFS.getLocalFileSystem().fromLocalFile(file));
+			} catch (CoreException e) {
+				throw new IllegalStateException(e);
+			}
+		});
+		SWTBotEditor editor = waitFor("the editor of outside.http", () -> editor("outside.http"));
+		editor.show();
+		UIThreadRunnable.syncExec(() -> EnvironmentSelection.select("local"));
+		editor.toTextEditor().contextMenu("Run HTTP Request").click();
+		Execution execution = waitForExecutions(1).get(0);
+		assertEquals(200, execution.response().status(), String.valueOf(execution.error()));
+		assertEquals("outside.http", execution.fileName());
+		editor.close();
+	}
+
+	private static IRegion lineOf(ITextViewer viewer, int line) {
+		try {
+			return viewer.getDocument().getLineInformation(line);
+		} catch (org.eclipse.jface.text.BadLocationException e) {
+			throw new IllegalStateException(e);
+		}
+	}
+
+	/** The display strings of the proposals at a line and a column, without the description of the source. */
+	private static List<String> proposalsAt(ITextViewer viewer, int line, int column) {
+		return UIThreadRunnable.syncExec(() -> {
+			List<String> result = new ArrayList<>();
+			for (org.eclipse.jface.text.contentassist.ICompletionProposal proposal : new HttpContentAssistProcessor()
+					.computeCompletionProposals(viewer, lineOf(viewer, line).getOffset() + column)) {
+				result.add(proposal.getDisplayString());
+			}
+			return result;
+		});
+	}
+
+	private static String hoverAt(ITextViewer viewer, int line, int column) {
+		return UIThreadRunnable.syncExec(() -> {
+			HttpTextHover hover = new HttpTextHover();
+			IRegion region = hover.getHoverRegion(viewer, lineOf(viewer, line).getOffset() + column);
+			return region == null ? null : (String) hover.getHoverInfo2(viewer, region);
+		});
 	}
 
 	// ---- the files and the editor --------------------------------------------------------
