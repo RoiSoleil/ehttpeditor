@@ -7,6 +7,7 @@ import org.eclipse.ehttpeditor.Activator;
 import org.eclipse.ehttpeditor.core.Environments;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
@@ -84,13 +85,33 @@ public final class EnvironmentSelection {
 		}
 	}
 
-	/** The HTTP document of the active editor, or null. */
+	/**
+	 * The HTTP document of the active editor. When the active editor is an environment file, the environments of its
+	 * folder; when it is another file, the first open HTTP editor. Null without any.
+	 */
 	public static HttpDocument activeDocument() {
 		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		IWorkbenchPage page = window != null ? window.getActivePage() : null;
-		if (page == null || page.getActiveEditor() == null) {
+		if (page == null) {
 			return null;
 		}
-		return HttpDocument.of(page.getActiveEditor().getAdapter(ITextEditor.class));
+		IEditorPart active = page.getActiveEditor();
+		if (active != null) {
+			HttpDocument document = HttpDocument.of(active.getAdapter(ITextEditor.class));
+			if (document == null) {
+				document = HttpDocument.ofEnvironmentFile(active.getEditorInput());
+			}
+			if (document != null) {
+				return document;
+			}
+		}
+		for (IEditorReference reference : page.getEditorReferences()) {
+			IEditorPart editor = HttpDocument.isHttpFileName(reference.getName()) ? reference.getEditor(false) : null;
+			HttpDocument document = editor != null ? HttpDocument.of(editor.getAdapter(ITextEditor.class)) : null;
+			if (document != null) {
+				return document;
+			}
+		}
+		return null;
 	}
 }
