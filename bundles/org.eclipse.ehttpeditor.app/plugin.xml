@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <!--
+      The standalone EHttpEditor: a window with the editors of the HTTP files and the view of the responses, without
+      the rest of the IDE.
+   -->
+   <extension id="application" point="org.eclipse.core.runtime.applications">
+      <application visible="true">
+         <run class="org.eclipse.ehttpeditor.app.HttpApplication"/>
+      </application>
+   </extension>
+
+   <extension id="product" point="org.eclipse.core.runtime.products">
+      <product
+            application="org.eclipse.ehttpeditor.app.application"
+            name="%productName">
+         <property name="appName" value="%productName"/>
+         <property name="windowImages"
+               value="icons/ehttpeditor16.png,icons/ehttpeditor32.png,icons/ehttpeditor48.png,icons/ehttpeditor64.png,icons/ehttpeditor128.png,icons/ehttpeditor256.png"/>
+         <property name="aboutImage" value="icons/ehttpeditor128.png"/>
+         <property name="aboutText" value="%productBlurb"/>
+         <property name="preferenceCustomization" value="plugin_customization.ini"/>
+      </product>
+   </extension>
+
+   <extension point="org.eclipse.ui.perspectives">
+      <perspective
+            class="org.eclipse.ehttpeditor.app.HttpPerspective"
+            icon="icons/ehttpeditor16.png"
+            id="org.eclipse.ehttpeditor.app.perspective"
+            name="%productName">
+      </perspective>
+   </extension>
+
+   <!-- File > New HTTP File..., File > Open File... and Help > Documentation -->
+   <extension point="org.eclipse.ui.commands">
+      <command
+            id="org.eclipse.ehttpeditor.app.newFile"
+            name="%command.newFile">
+      </command>
+      <command
+            id="org.eclipse.ehttpeditor.app.openFile"
+            name="%command.openFile">
+      </command>
+      <command
+            id="org.eclipse.ehttpeditor.app.documentation"
+            name="%command.documentation">
+      </command>
+   </extension>
+
+   <extension point="org.eclipse.ui.handlers">
+      <handler
+            class="org.eclipse.ehttpeditor.app.NewFileHandler"
+            commandId="org.eclipse.ehttpeditor.app.newFile">
+      </handler>
+      <handler
+            class="org.eclipse.ehttpeditor.app.OpenFileHandler"
+            commandId="org.eclipse.ehttpeditor.app.openFile">
+      </handler>
+      <handler
+            class="org.eclipse.ehttpeditor.app.DocumentationHandler"
+            commandId="org.eclipse.ehttpeditor.app.documentation">
+      </handler>
+   </extension>
+
+   <!-- Ctrl+N is the New wizard of the workbench: only Open File has a key -->
+   <extension point="org.eclipse.ui.bindings">
+      <key
+            commandId="org.eclipse.ehttpeditor.app.openFile"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+O">
+      </key>
+   </extension>
+
+   <extension point="org.eclipse.ui.menus">
+      <menuContribution locationURI="menu:file?after=open">
+         <command commandId="org.eclipse.ehttpeditor.app.newFile" style="push"/>
+         <command commandId="org.eclipse.ehttpeditor.app.openFile" style="push"/>
+      </menuContribution>
+      <menuContribution locationURI="menu:help?after=additions">
+         <command commandId="org.eclipse.ehttpeditor.app.documentation" style="push"/>
+      </menuContribution>
+   </extension>
+
+</plugin>

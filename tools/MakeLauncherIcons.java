@@ -12,7 +12,7 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 
 /**
- * Writes the icons of the launchers of the standalone application from the PNG of the branding (drawn by
+ * Writes the icons of the launchers of the standalone application from the PNG of the application (drawn by
  * MakeIcon.java): ehttpeditor.ico (Windows), ehttpeditor.icns (macOS) and ehttpeditor.xpm (Linux).
  * Usage: java tools/MakeLauncherIcons.java <folder of ehttpeditor16.png...ehttpeditor256.png> <output folder>
  */

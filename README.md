@@ -81,9 +81,10 @@ EHttpEditor needs TM4E (TextMate support, in the Eclipse release update site, al
 
 # Standalone application
 
-EHttpEditor is also packaged alone, without the rest of the Eclipse IDE: a small application (about 50 MB) with
-only the HTTP client, the Project Explorer and the text editors. Download the archive of your platform from the
-[latest build](https://github.com/RoiSoleil/ehttpeditor/releases/tag/latest), extract it and run `ehttpeditor`:
+EHttpEditor is also packaged alone, without the rest of the Eclipse IDE: a small application (about 45 MB), a
+window with only the editors of the `.http` files and the *HTTP Client* view. Download the archive of your platform
+from the [latest build](https://github.com/RoiSoleil/ehttpeditor/releases/tag/latest), extract it and run
+`ehttpeditor`:
 
 | Platform | Archive |
 | --- | --- |
@@ -95,8 +96,10 @@ only the HTTP client, the Project Explorer and the text editors. Download the ar
 
 - It needs Java 21 or later, installed (not included, to keep the archive small): the one of the `PATH`, or the one
   set with `-vm` in `ehttpeditor.ini`.
-- The files are opened with *File > Open File...* or from the projects of the workspace
-  (`ehttpeditor-workspace` in the home folder; *File > Switch Workspace* to change it).
+- At the start, `requests.http` opens, with commented examples of GET and POST (in `ehttpeditor-workspace`, in the
+  home folder). *File > New HTTP File...* creates another one, *File > Open File...* opens a file, and
+  `ehttpeditor path/to/file.http` opens it from the command line.
+- *Help > Documentation* opens the [guide](docs/guide.md): the syntax, the variables, the environments, the scripts.
 - macOS: the application is not signed; after the extraction, `xattr -cr EHttpEditor.app` lets it start.
 
 # Build
@@ -130,12 +133,12 @@ The icons are drawn by `tools/MakeIcon.java` (the view icon is the same drawing 
 java tools/MakeIcon.java ehttpeditor 16 bundles/org.eclipse.ehttpeditor/icons/ehttpeditor.png
 ```
 
-The icons of the standalone application are the same drawing: `bundles/org.eclipse.ehttpeditor.branding/icons`
+The icons of the standalone application are the same drawing: `bundles/org.eclipse.ehttpeditor.app/icons`
 (`ehttpeditor16.png` to `ehttpeditor256.png`, drawn by `MakeIcon.java`), and the icons of the launchers (`.ico`,
 `.icns`, `.xpm`) written from them:
 
 ```bash
-java tools/MakeLauncherIcons.java bundles/org.eclipse.ehttpeditor.branding/icons products/org.eclipse.ehttpeditor.product/icons
+java tools/MakeLauncherIcons.java bundles/org.eclipse.ehttpeditor.app/icons products/org.eclipse.ehttpeditor.product/icons
 ```
 
 # License

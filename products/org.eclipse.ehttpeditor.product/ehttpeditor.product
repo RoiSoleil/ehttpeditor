@@ -2,21 +2,25 @@
 <?pde version="3.5"?>
 
 <!--
-   The standalone EHttpEditor: the smallest workbench which opens and runs the .http files. Only the roots are
-   listed: the other bundles (the workbench of the IDE, the Project Explorer, the Generic Editor, Rhino...) are their
-   requirements, added by p2. A feature such as org.eclipse.e4.rcp would bring bundles which are not used (the OSGi
-   console, ASM...).
+   The standalone EHttpEditor: the smallest workbench which opens and runs the .http files, a window with the
+   editors and the view of the responses. Only the roots are listed: the other bundles (the workbench, the Generic
+   Editor, Rhino...) are their requirements, added by p2. A feature such as org.eclipse.e4.rcp would bring bundles
+   which are not used (the OSGi console, ASM...), and the application of the IDE the Project Explorer, the
+   refactorings and the team support.
 -->
-<product name="EHttpEditor" uid="org.eclipse.ehttpeditor.product" id="org.eclipse.ehttpeditor.branding.product"
-      application="org.eclipse.ui.ide.workbench" version="1.0.0.qualifier" type="bundles" includeLaunchers="true"
+<product name="EHttpEditor" uid="org.eclipse.ehttpeditor.product" id="org.eclipse.ehttpeditor.app.product"
+      application="org.eclipse.ehttpeditor.app.application" version="1.0.0.qualifier" type="bundles" includeLaunchers="true"
       autoIncludeRequirements="true">
 
    <configIni use="default">
    </configIni>
 
    <launcherArgs>
-      <!-- No workspace chooser: the workspace of the HTTP files -->
-      <programArgs>-data @user.home/ehttpeditor-workspace
+      <!--
+         No workspace chooser: the workspace of the HTTP files. "ehttpeditor file.http" (and a double click on Windows)
+         opens the file in the window.
+      -->
+      <programArgs>-data @user.home/ehttpeditor-workspace --launcher.defaultAction openFile
       </programArgs>
       <vmArgs>-Xms64m -Xmx512m
       </vmArgs>
@@ -38,8 +42,8 @@
 
    <plugins>
       <plugin id="org.eclipse.ehttpeditor"/>
-      <!-- The product, its icons, the workbench of the IDE and the Project Explorer -->
-      <plugin id="org.eclipse.ehttpeditor.branding"/>
+      <!-- The application, the product and its icons -->
+      <plugin id="org.eclipse.ehttpeditor.app"/>
       <!-- The coloring of the .http files (the plug-in declares its grammar without requiring TM4E) -->
       <plugin id="org.eclipse.tm4e.ui"/>
       <plugin id="org.eclipse.tm4e.registry"/>
@@ -62,6 +66,8 @@
       <plugin id="org.eclipse.equinox.launcher.cocoa.macosx.aarch64" fragment="true" os="macosx" ws="cocoa" arch="aarch64"/>
       <plugin id="org.eclipse.equinox.launcher.win32.win32.x86_64" fragment="true" os="win32" ws="win32" arch="x86_64"/>
       <plugin id="org.eclipse.e4.ui.workbench.renderers.swt.cocoa" fragment="true" os="macosx" ws="cocoa"/>
+      <!-- The menu of the application on macOS: About, Preferences, Quit -->
+      <plugin id="org.eclipse.ui.cocoa" fragment="true" os="macosx" ws="cocoa"/>
    </plugins>
 
    <configurations>
