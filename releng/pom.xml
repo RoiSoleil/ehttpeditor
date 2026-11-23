@@ -9,8 +9,14 @@
 		<tycho.version>5.0.4</tycho.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<eclipse-repo.url>https://download.eclipse.org/releases/latest</eclipse-repo.url>
-		<!-- Rhino runs the scripts: the version of the Eclipse release (Orbit) is the one the feature takes. -->
-		<rhino.version>1.9.2</rhino.version>
+		<!--
+			Rhino runs the scripts: the version of the Eclipse release (Orbit) is the one the feature takes.
+			The 1.9.1 jar of Maven Central has no OSGi metadata, so the target platform keeps the bundle of Orbit.
+			1.9.2 is an OSGi bundle, but it requires the ServiceLoader extenders, which the target platform does
+			not provide (Tycho fails with "Filter is missing for required capability osgi.serviceloader").
+			See the ignore of org.mozilla:rhino in dependabot.yml.
+		-->
+		<rhino.version>1.9.1</rhino.version>
 		<jacoco.version>0.8.15</jacoco.version>
 		<!-- JaCoCo agent of the tests (set by jacoco:prepare-agent), used by tycho-surefire -->
 		<tycho.testArgLine></tycho.testArgLine>

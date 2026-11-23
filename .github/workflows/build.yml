@@ -9,6 +9,9 @@ permissions:
 jobs:
    build:
       runs-on: ubuntu-latest
+      env:
+         # Secrets are not usable in the if of a step: the token goes through an environment variable
+         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       steps:
       -  name: Checkout
          uses: actions/checkout@v7
@@ -34,11 +37,14 @@ jobs:
             set -o pipefail
             xvfb-run -a mvn -B clean install 2>&1 | tee build.log
       -  name: Upload the coverage to Codecov
+         # The token of the secrets is not given to the runs of dependabot: without it, Codecov refuses
+         # the uploads on the protected branches (the coverage of a PR stays in the summary of the run).
+         if: env.CODECOV_TOKEN != ''
          uses: codecov/codecov-action@v7
          with:
             files: tests/org.eclipse.ehttpeditor.coverage/target/site/jacoco-aggregate/jacoco.xml
             fail_ci_if_error: true
-            token: ${{ secrets.CODECOV_TOKEN }}
+            token: ${{ env.CODECOV_TOKEN }}
       -  name: Coverage by class
          # The line coverage of each class, in the summary of the run and as an annotation.
          run: |
