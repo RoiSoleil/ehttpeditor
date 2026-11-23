@@ -17,7 +17,7 @@
 			See the ignore of org.mozilla:rhino in dependabot.yml.
 		-->
 		<rhino.version>1.9.1</rhino.version>
-		<jacoco.version>0.8.15</jacoco.version>
+		<jacoco.version>0.8.16</jacoco.version>
 		<!-- JaCoCo agent of the tests (set by jacoco:prepare-agent), used by tycho-surefire -->
 		<tycho.testArgLine></tycho.testArgLine>
 		<swtbot-repo.url>https://download.eclipse.org/technology/swtbot/releases/latest/</swtbot-repo.url>
