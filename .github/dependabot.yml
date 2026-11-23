@@ -9,6 +9,11 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "weekly"
+    ignore:
+      # Rhino is the bundle of the Eclipse release (Orbit, see releng/pom.xml): the 1.9.2 jar of Maven
+      # Central is an OSGi bundle whose ServiceLoader requirements the target platform cannot resolve.
+      - dependency-name: "org.mozilla:rhino"
+        versions: ["> 1.9.1"]
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
